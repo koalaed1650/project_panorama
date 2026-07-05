@@ -1,20 +1,22 @@
 backend:
   name: git-gateway
-  branch: main # Tells it to save to your main branch on GitHub
+  branch: main # Change this to 'master' if your GitHub repository uses master instead of main
 
-media_folder: "images" # Where images uploaded via dashboard go
+media_folder: "images"
 public_folder: "images"
 
 collections:
-  - name: "gallery"
-    label: "My Photos"
-    file: "gallery-data.json" # The data file Decap will overwrite
-    type: "json"
-    fields:
-      - label: "Gallery Slides"
-        name: "slides"
-        widget: "list" # Allows you to drag, re-order, or add unlimited new slides
+  - name: "content"
+    label: "Website Content"
+    files:
+      - name: "gallery"
+        label: "My Photos"
+        file: "gallery-data.json"
         fields:
-          - { label: "Photo", name: "image", widget: "image" }
-          - { label: "Title", name: "title", widget: "string" }
-          - { label: "Caption Text", name: "caption", widget: "text" }
+          - label: "Gallery Slides"
+            name: "slides"
+            widget: "list"
+            fields:
+              - { label: "Photo", name: "image", widget: "image" }
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Caption Text", name: "caption", widget: "text" }
