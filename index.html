@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Split Gallery</title>
+    <style>
+        /* All layout CSS remains exactly the same as before */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: system-ui, sans-serif; display: flex; height: 100vh; overflow: hidden; background-color: #1a1a1a; color: #fff; }
+        .image-pane { flex: 1; position: relative; height: 100%; background-color: #000; }
+        .gallery-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.5s ease-in-out; }
+        .gallery-img.active { opacity: 1; }
+        .caption-pane { width: 400px; height: 100%; display: flex; flex-direction: column; border-left: 1px solid #333; background-color: #222; }
+        .caption-content-wrapper { flex: 1; overflow-y: auto; padding: 40px; }
+        .caption-block h2 { margin-bottom: 20px; font-size: 24px; }
+        .caption-block p { line-height: 1.6; color: #ccc; margin-bottom: 15px; }
+        .controls { padding: 20px 40px; border-top: 1px solid #333; display: flex; justify-content: flex-end; background-color: #1f1f1f; }
+        .arrow-btn { background: none; border: 1px solid #555; color: white; padding: 10px 20px; cursor: pointer; font-size: 16px; border-radius: 4px; }
+        .arrow-btn:hover { background-color: #333; }
+        @media (max-width: 768px) { body { flex-direction: column; } .image-pane { height: 45vh; } .caption-pane { width: 100%; height: 55vh; } }
+    </style>
+</head>
+<body>
+
+    <!-- Containers start completely empty now -->
+    <div class="image-pane" id="imagePane"></div>
+
+    <div class="caption-pane">
+        <div class="caption-content-wrapper">
+            <div class="caption-block" id="captionBlock">
+                <!-- JavaScript will inject the title and text here dynamically -->
+                <h2 id="galleryTitle"></h2>
+                <div id="galleryText"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+    <button class="arrow-btn" id="prevBtn">&larr; Prev</button>
+    <button class="arrow-btn" id="nextBtn">Next &rarr;</button>
+</div>
+    </div>
+
+    <!-- 1. CRITICAL: Load your data file first -->
+    <script src="gallery-data.json"></script>
+
+    <!-- 2. This script hooks up the data to the page -->
+    <!-- 1. REMOVE the old <script src="gallery-data.js"></script> if it's still there -->
+
+<!-- 2. REPLACE your entire script block at the bottom with this one: -->
+<script>
+    const imagePane = document.getElementById('imagePane');
+    const galleryTitle = document.getElementById('galleryTitle');
+    const galleryText = document.getElementById('galleryText');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const textWrapper = document.querySelector('.caption-content-wrapper');
+
+    let currentIndex = 0;
+    let galleryData = []; // Starts empty, will be populated by fetch
+
+    // 1. Fetch data seamlessly from the JSON file
+    fetch('gallery-data.json')
+        .then(response => response.json())
+        .then(data => {
+            galleryData = data; // Store the loaded JSON items here
+            initGallery();      // Build the page structure
+        })
+        .catch(error => console.error('Error loading gallery-data.json:', error));
+
+    // 2. Initialize the gallery layout once data arrives
+    function initGallery() {
+        if (galleryData.length === 0) return;
+
+        // Inject all images upfront so they pre-load smoothly
+        galleryData.forEach((item, index) => {
+            const img = document.createElement('img');
+            img.src = item.image;
+            img.className = index === 0 ? 'gallery-img active' : 'gallery-img';
+            img.alt = item.title;
+            imagePane.appendChild(img);
+        });
+
+        // Load the text for slide 0
+        updateSlideContent();
+    }
+
+    // 3. Central function to change text and manage scroll reset
+    function updateSlideContent() {
+        galleryTitle.textContent = galleryData[currentIndex].title;
+        galleryText.innerHTML = galleryData[currentIndex].caption;
+        textWrapper.scrollTop = 0; 
+    }
+
+    // 4. Handle transition animations cleanly
+    function navigateToSlide(nextIndex) {
+        const images = document.querySelectorAll('.gallery-img');
+        
+        images[currentIndex].classList.remove('active'); // Hide old
+        currentIndex = nextIndex;                        // Swap index
+        images[currentIndex].classList.add('active');    // Show new
+        
+        updateSlideContent();
+    }
+
+    // 5. Button Click Handlers
+    nextBtn.addEventListener('click', () => {
+        if (galleryData.length === 0) return;
+        let targetIndex = (currentIndex + 1) % galleryData.length;
+        navigateToSlide(targetIndex);
+    });
+
+    prevBtn.addEventListener('click', () => {
+        if (galleryData.length === 0) return;
+        let targetIndex = (currentIndex - 1 + galleryData.length) % galleryData.length;
+        navigateToSlide(targetIndex);
+    });
+
+    // 6. Arrow Key Support
+    window.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowRight') {
+            nextBtn.click();
+        } else if (event.key === 'ArrowLeft') {
+            prevBtn.click();
+        }
+    });
+</script>
+</body>
+</html>
