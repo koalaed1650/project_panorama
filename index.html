@@ -62,14 +62,15 @@
     let galleryData = []; // Starts empty, will be populated by fetch
 
     // 1. Fetch data seamlessly from the JSON file
+    // Update ONLY this fetch block inside your index.html script:
     fetch('gallery-data.json')
         .then(response => response.json())
         .then(data => {
-            galleryData = data; // Store the loaded JSON items here
-            initGallery();      // Build the page structure
+            // CHANGE THIS LINE: point it to data.slides instead of just data
+            galleryData = data.slides || []; 
+            initGallery();      
         })
         .catch(error => console.error('Error loading gallery-data.json:', error));
-
     // 2. Initialize the gallery layout once data arrives
     function initGallery() {
         if (galleryData.length === 0) return;
