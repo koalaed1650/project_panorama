@@ -2,13 +2,8 @@
   "slides": [
     {
       "image": "images/160916_094aw.png",
-    "title": "First Photograph Title",
-    "caption": "This is the first paragraph text."
-    }
-    {
-    "image": "images/161125_018a.jpg",
-    "title": "Second Photograph Title",
-    "caption": "This is the second paragraph text."
+      "title": "Sunset",
+      "caption": "Sunset Sunset Sunset"
     }
   ]
 }
